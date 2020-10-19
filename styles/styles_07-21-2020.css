@@ -1,0 +1,395 @@
+/* _________________________________________
+                COLORS
+____________________________________________ */
+
+.container {
+    background-color: #555;
+}
+
+
+/* .vert-spacer {
+    background-color: rgb(242, 242, 242);
+} */
+
+.chore-list-wrapper {
+    background-color: rgb(242,242,242);
+}
+
+.earnings-section-wrapper {
+    background-color: rgb(242,242,242);
+}
+
+.bg-light-blue {
+    background-color: rgb(91,191,222);
+
+}
+
+.bg-light-gray {
+    background-color: rgb(242,242,242);
+}
+
+.bg-dark-gray {
+    background-color: rgb(127,127,127);
+}
+
+.bg-yellow {
+    background-color: yellow;
+}
+
+/* _________________________________________
+            DYNAMIC ANIMATIONS
+____________________________________________ */
+
+.material-icons { /* includes .menu-icon, .settings-icon, .info-icon, .check-icon, .comment-icon */
+font-size: 1.5em;
+transition: 50ms;
+}
+
+
+
+.material-icons:hover {
+    font-size: 1.75em;
+    transition: 50ms;
+}
+
+
+/* _________________________________________*/
+/* LAYOUT: LANDSCAPE
+/* _________________________________________*/
+.main {
+    box-sizing: border-box;
+    height:94vh;
+}    
+
+
+.nav-wrapper { 
+    box-sizing: border-box;
+    position: relative;
+    height: 12%;
+    max-height: 150px;
+}
+
+/* .vert-spacer {
+    box-sizing: border-box;
+    position: relative;
+    height: 2%;
+} */
+
+.chore-list-wrapper {
+    position: relative;
+    box-sizing: border-box;
+    height: 50%;
+    overflow-y: auto;
+    overflow-x:hidden;
+    /* border-bottom: 1px solid black; */
+}
+
+.earnings-section-wrapper {
+    box-sizing: border-box;
+    position: relative;
+    height: 35%; 
+}
+
+
+body {
+    box-sizing: border-box;
+    margin:0;
+    font-family: 'Lora',sans-serif;
+}
+
+
+.inline-flex {
+    display: inline-flex;
+}
+
+
+/*
+    .mobile-navbar-top {
+    position: relative;
+    font-weight: bold;
+    font-size: 2rem;
+    max-height: 100px;
+}
+
+.mobile-navbar-job-types {
+    position: relative;
+    border-bottom: 1px solid blue;
+    padding-top: 0.5rem;
+
+}
+
+.menu-job-type {
+    box-sizing: content-box;
+    font-weight: 400;
+    text-align: center;
+    border-bottom: 0.25rem solid transparent;
+    
+}
+
+.menu-job-type:hover {
+    box-sizing: border-box;
+    font-weight: 700;
+    color: white;
+    border-bottom: 0.25rem solid orange;
+    transition-duration: 250ms;
+}
+ */
+
+ .mobile-navbar-top {
+    position: relative;
+    height: 50%;
+    font-weight: bold;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.mobile-navbar-job-type {
+    position: relative;
+    box-sizing: border-box;
+    font-size: calc(2vmin + 0.25rem);
+    height: 50%;
+    font-weight: 400;
+    color: #5a5a5a;
+    border-top: 1px solid blue;
+    border-bottom: 1px solid blue;
+    background-color: rgb(91,191,222);
+    padding-top: 0.5rem;
+    clear: both;
+}
+
+.mobile-navbar-job-type:hover {
+    background-color:gold;
+    position: relative;
+    font-weight: 700;
+    color: black;
+    /*border-bottom: 0.25rem solid orange;*/
+    transition-duration: 250ms;
+}
+
+.menu-job-type {
+    position: relative;
+    /*border-top: none;*/
+    /*border-bottom: none;*/
+    text-align: center;
+}
+
+/*.menu-job-type:hover {*/
+/*    position: relative;*/
+/*    font-weight: 700;*/
+/*    color: black;*/
+    /*border-bottom: 0.25rem solid orange;*/
+/*    transition-duration: 250ms;*/
+/*}*/
+
+.chore:hover {
+    background-color: gold
+}
+
+
+.task-bubble {
+    position: relative;
+    border: 1px solid black;
+    border-radius: 0.75rem;
+    background-color: white;
+}
+
+.task-bubble:hover {
+    background-color: lightgoldenrodyellow;
+    height: 130%;
+}
+
+
+
+.due-date {
+    font-size: 0.375rem;
+    /*font-weight: bold;      */
+}
+
+.due-date:hover {
+    font-size: 0.75rem;
+    font-weight: bold;
+    right: 10px;
+}
+
+
+.task-bubble-footer {
+    position: relative;
+    height: 2rem;
+}
+
+.time-stamp {
+    font-size: 0.375rem;
+    position: relative;
+}
+
+.time-stamp:hover {
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+.status-msg {
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.btn.text-nowrap{
+    width: 9rem;
+}
+
+
+.center-btn {
+    position: relative;
+    margin: auto;
+     height: 10%; 
+
+}
+
+.earnings-section {
+    /* box-sizing: border-box;
+    padding: 0 10px 0 10px; */
+    /*height: 25%;*/
+}
+
+/*.amount-due {*/
+/*    position: relative;*/
+/*    font-size: 1.5rem;*/
+/*    font-weight: bold;*/
+    /* width: 5rem; */
+/*    background-color: green;*/
+/*    text-align: center;*/
+/*    padding: auto;*/
+/*}*/
+
+.days-left, .earnings {
+    color: green;
+    font-size: 1.25rem;
+    font-weight: bold;
+    font-family: 'Lora', sans;
+    text-align: center;
+}
+
+#countdown, #amount-due {
+    position: relative;
+    box-sizing: border-box;
+    border: 2px solid black;
+    border-radius: 50%;
+    color: green;
+    /* height: 100px;
+    width: 100px; */
+    height: 2.75em;
+    width: 2.75em;
+    font-size: 2em;
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+    padding: auto;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+.bonus   {
+    background-image: url(../img/bonus.png);
+    background-size: 90px auto;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: 50ms;
+}
+
+.nobonus {
+    background-image: url(../img/nobonus.png);
+    background-size: 90px auto;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: 50ms;
+}
+
+div.completion-status > i {
+    position: relative;
+}    
+    
+
+
+
+/* _________________________________________
+    LAYOUT: 
+    ADJUSTMENTS FOR PORTRAIT MODE
+____________________________________________ */
+/*@media only screen and (orientation: portrait) {*/
+/*    .main {*/
+/*        height:94vmax;*/
+/*        width: 100vmin;*/
+/*    }    */
+
+
+/*    .nav-wrapper { */
+/*        height: 15%;*/
+/*        max-height: 100px;*/
+/*    } */
+
+    /* .vert-spacer {
+        height: 2%;
+    } */
+
+/*    .chore-list-wrapper {*/
+/*        box-sizing: border-box;*/
+/*        height:45%;*/
+/*        overflow-y: auto;*/
+/*        overflow-x:hidden;*/
+
+/*    }*/
+
+/*    .earnings-section-wrapper {*/
+/*        height:40%;*/
+        /*max-height: 350px;*/
+/*        overflow: hidden;*/
+/*    }*/
+
+/*    body {*/
+/*        box-sizing: border-box;*/
+/*        overflow: hidden;*/
+/*    }*/
+
+
+/*    .mobile-navbar-top {*/
+/*        height: 65%;*/
+/*        font-size: 1.5rem;*/
+/*    }*/
+
+/*    .mobile-navbar-job-types {*/
+/*        height: 35%;*/
+/*    }*/
+
+
+    /*.earnings-section {*/
+    /*    height: 25%;*/
+    /*}*/
+
+
+
+/*    #countdown, #amount-due {*/
+        /*height: 12vmin;*/
+        /*width: 12vmin;*/
+        /*font-size: 5vmin;*/
+/*        height: 2.5em;*/
+/*        width: 2.5em;*/
+/*        font-size: 2em;*/
+/*    }*/
+
+
+/*    .trophy-locked{*/
+/*        height: 100%;*/
+/*    }*/
+
+/*    .trophy-unlocked{*/
+/*        height: 100%;*/
+/*    }*/
+
+/*    div.completion-status > i {*/
+/*        position: relative;*/
+/*        height: 20%;*/
+/*        font-size: 0.75rem;*/
+/*    }*/
+/*} */
+/* end of portrait mode height adjustments */

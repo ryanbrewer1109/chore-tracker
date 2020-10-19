@@ -130,6 +130,7 @@
                 
                 $tempChoreName = "choreID_".$i;
                 $tempCheckbox = "checkbox_".$i;
+//                $tempCounter = "counter_".$i;
 
                 $thisChoreNum = $_REQUEST[$tempChoreName]; // passed from hidden input field
                 // echo "<script>alert('Value of {$tempChoreName} is {$thisChoreNum}');</script>";
@@ -356,7 +357,7 @@
                     else:
                         global $chorelistExists;
                         $chorelistExists = true;
-                        if($DebugMode):
+                        if($DebugMode): 
                             echo "<br><br>SUCCESS! FETCHING CHORES...";
                             echo "<p>The following query returned some results:<br>{$query_getchorelist}</p>";
                         endif;
@@ -564,53 +565,10 @@
                                          <p class = \"text-success job-pay\">Value: $ {$job_pay}</p>
                                         </div>
 
-                                    </div> <!--  End div.row  -->                                  
+                                    </div> <!--  End div.row  -->    
+                                    
                                "; // End of double quote section
-                        endwhile;
-
-
-                        // Include $counter in $_POST data
-                        echo "<input type = \"hidden\" id = \"form_counter\"  
-                              name = \"form_counter\" value = \"{$counter}\">";
-                    endif;
-                    
-                    //Free up the result memory and close the connection
-//                    $result_assignment-> mysqli_free_result();  // check variable name and syntax
-                    $connection3 -> close();
-                endif;
-                ?>
-            
-            </section> <!--  End of middle section -->
-            
-            <!-- =========================================== -->
-            <!-- BOTTOM SECTION: EARNINGS MODULE -->
-            <!-- =========================================== -->
-            
-            <section class="earnings-section-wrapper container text-center bg-light">
-
-                <!-- =========================================== -->
-                <!-- Row for Save & Update Button-->
-                <!-- =========================================== -->
-                <div class ="row bg-light pb-3 border-bottom">
-                    <div class="col- col-sm- center-btn pt-3">
-                         <button type = "submit" name="submit-tasklist" value ="save"  class="btn btn-success text-nowrap update-btn">
-                                Save & Update
-                         </button>
-                        <p>        
-                            <label class = "d-none">Page Loaded Timestamp: <input 
-                                id = "localTimestamp"
-                                type = "text" 
-                                name = "local_timestamp" 
-                                
-                                >
-                        
-                            </label>        
-                        </p>
-                    </div>  <!-- End div.col-.col-sm- .center-btn -->  
-                    
-                </div>   <!-- End row -->
-
-
+                                         
                 <!-- =========================================== -->
                 <!-- Row for Days Left, Trophy image, and Earnings -->
                 <!-- =========================================== -->
@@ -701,6 +659,60 @@
             ?>
                 </div>  <!-- End of div.d-flex  -->
             </div>  <!-- End of .row .bg-dark  -->
+
+                                         
+                                         
+                                         
+                                         
+                                         
+                                         
+                                         
+                                         
+                        endwhile;
+
+
+                        // Include $counter in $_POST data
+                        echo "<input type = \"hidden\" id = \"form_counter\"  
+                              name = \"form_counter\" value = \"{$counter}\">";
+                    endif;
+                    
+                    //Free up the result memory and close the connection
+//                    $result_assignment-> mysqli_free_result();  // check variable name and syntax
+                    $connection3 -> close();
+                endif;
+                ?>
+            
+            </section> <!--  End of middle section -->
+            
+            <!-- =========================================== -->
+            <!-- BOTTOM SECTION: EARNINGS MODULE -->
+            <!-- =========================================== -->
+            
+            <section class="earnings-section-wrapper container text-center bg-light">
+
+                <!-- =========================================== -->
+                <!-- Row for Save & Update Button-->
+                <!-- =========================================== -->
+                <div class ="row bg-light pb-3 border-bottom">
+                    <div class="col- col-sm- center-btn pt-3">
+                         <button type = "submit" name="submit-tasklist" value ="save"  class="btn btn-success text-nowrap update-btn">
+                                Save & Update
+                         </button>
+                        <p>        
+                            <label class = "d-none">Page Loaded Timestamp: <input 
+                                id = "localTimestamp"
+                                type = "text" 
+                                name = "local_timestamp" 
+                                
+                                >
+                        
+                            </label>        
+                        </p>
+                    </div>  <!-- End div.col-.col-sm- .center-btn -->  
+                    
+                </div>   <!-- End row -->
+
+
             </section> 
             <!-- End of earnings section-wrapper -->
         </div> <!-- End of div.main -->

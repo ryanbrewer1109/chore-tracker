@@ -1,0 +1,466 @@
+/* _________________________________________
+                COLORS
+____________________________________________ */
+
+.container {
+    background-color: #555;
+}
+.row {
+    /*border: 2px dashed red;*/
+}
+
+@media screen and (orientation: landscape) {
+     body {
+    background-color: #FDDB44;
+    }
+    
+
+    
+    .login .splash {
+    position: relative;
+    width:60%;
+    height: 90vmin;
+    background-image: url(../img/splash_hero2.png);
+    background-size:contain;
+    background-repeat: no-repeat;
+    background-color: #FDDB44;
+    padding-top: 5%;
+    padding-bottom: 10%;
+    padding-left: 20%;
+    }
+    
+    .login form {
+    position: relative;
+    padding-top: 10%;
+    /*border: 2px dashed red;*/
+    }
+    
+    select#due_hours,  select#due_minutes,  select#due_am_pm {
+    width: 50px;
+}
+
+}
+  
+  
+@media screen and (orientation: portrait) {
+     body {
+    background-color: #FDDB44;
+    }
+    
+    
+    .login .splash {
+    position: relative;
+    width: 90vw;
+    height:100%;
+    background-image: url(../img/splash_hero2.png);
+    background-size:contain;
+    background-repeat: no-repeat;
+    background-color: #FDDB44;
+    padding-top: 25%;
+    padding-bottom: 10%;
+    padding-left: 10%;
+    padding-right: 10%;
+    }
+    
+    .login form {
+    position: relative;
+    padding-top: 10%;
+    }
+}
+
+select#due_hours, select#due_minutes, select#due_am_pm {
+    width: 50px;
+}
+
+/* .vert-spacer {
+    background-color: rgb(242, 242, 242);
+} */
+
+.chore-list-wrapper {
+    background-color: rgb(242,242,242);
+}
+
+.earnings-section-wrapper {
+    background-color: rgb(242,242,242);
+}
+
+.bg-light-blue {
+    background-color: rgb(91,191,222);
+
+}
+
+.bg-light-gray {
+    background-color: rgb(242,242,242);
+}
+
+.bg-dark-gray {
+    background-color: rgb(127,127,127);
+}
+
+.bg-yellow {
+    background-color: yellow;
+}
+
+/* _________________________________________
+            DYNAMIC ANIMATIONS
+____________________________________________ */
+
+i.menu-icon, i.settings-icon, 
+i.info-icon, i.comment-icon, 
+i.check-clickable { 
+    font-size: 1.5em;
+    transition: 50ms;
+}
+
+
+i.menu-icon:hover, i.settings-icon:hover, 
+i.info-icon:hover, i.comment-icon:hover, 
+label > input + i:hover {
+    cursor: pointer;
+    font-size: 1.75em;
+    transition: 50ms;
+}
+
+/* _________________________________________*/
+/* LAYOUT: LANDSCAPE
+/* _________________________________________*/
+
+
+.main {
+    box-sizing: border-box;
+    height:94vh;
+}    
+
+
+.nav-wrapper { 
+    box-sizing: border-box;
+    position: relative;
+    height: 12%;
+    max-height: 150px;
+}
+
+/* .vert-spacer {
+    box-sizing: border-box;
+    position: relative;
+    height: 2%;
+} */
+
+.chore-list-wrapper {
+    position: relative;
+    box-sizing: border-box;
+    height: 50%;
+    overflow-y: auto;
+    overflow-x:hidden;
+    /* border-bottom: 1px solid black; */
+}
+
+.earnings-section-wrapper {
+    box-sizing: border-box;
+    position: relative;
+    height: 35%; 
+}
+
+
+body {
+    box-sizing: border-box;
+    margin:0;
+    font-family: 'Lora',sans-serif;
+}
+
+
+.inline-flex {
+    display: inline-flex;
+}
+
+ .mobile-navbar-top {
+    position: relative;
+    height: 50%;
+    font-weight: bold;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.mobile-navbar-job-type {
+    position: relative;
+    box-sizing: border-box;
+    font-size: calc(2vmin + 0.25rem);
+    height: 50%;
+    font-weight: 400;
+    color: #5a5a5a;
+    border-top: 1px solid blue;
+    border-bottom: 1px solid blue;
+    background-color: rgb(91,191,222);
+    padding-top: 0.5rem;
+    clear: both;
+}
+
+.mobile-navbar-job-type:hover {
+    background-color:lightskyblue;
+    position: relative;
+    font-weight: 700;
+    color: black;
+    transition-duration: 250ms;
+    cursor: pointer;
+}
+
+.menu-job-type {
+    position: relative;
+    /*border-top: none;*/
+    /*border-bottom: none;*/
+    text-align: center;
+}
+
+
+.active, .active:hover {
+    background-color: gold;
+    font-weight: 700;
+    color: black;
+    cursor: auto;
+}
+
+.inactive:hover {
+    background-color: lightskyblue;;
+    font-weight: 700;
+    color: black;
+    cursor: pointer;
+
+    
+}
+
+
+.task-bubble {
+    position: relative;
+    border: 1px solid black;
+    border-radius: 0.75rem;
+    background-color: white;
+}
+
+.task-bubble:hover {
+    background-color: lightgoldenrodyellow;
+    color: black;
+}
+
+
+.details, .due-date, .job-pay, .time-stamp {
+    font-size: 0.75em;
+}
+
+.due-date:hover, .job-pay:hover, .time-stamp:hover {
+    font-size: 0.85em;
+    font-weight: bold;
+}
+
+/*.check-clickable {*/
+/*    background: yellow;*/
+/*    display: block;*/
+/*    height: 100%;*/
+/*}*/
+
+label {
+    /*background: yellow;*/
+    position: relative;
+    display: inline-block;
+    height: 100%;
+    margin: auto;
+}
+label i {
+    /*border: 1px solid red;*/
+    /*margin: auto;*/
+    /*padding: auto;*/
+
+}
+
+
+input[checkbox] {
+    /*position: absolute;*/
+    /*right: -30px;*/
+    /*bottom: 30%;*/
+    
+}
+
+.task-bubble-footer {
+    position: relative;
+    height: 2rem;
+}
+
+
+.status-msg {
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.btn.text-nowrap{
+    width: 9rem;
+}
+
+
+.center-btn {
+    position: relative;
+    margin: auto;
+     height: 10%; 
+
+}
+
+.earnings-section {
+    /* box-sizing: border-box;
+    padding: 0 10px 0 10px; */
+    /*height: 25%;*/
+}
+
+/*.amount-due {*/
+/*    position: relative;*/
+/*    font-size: 1.5rem;*/
+/*    font-weight: bold;*/
+    /* width: 5rem; */
+/*    background-color: green;*/
+/*    text-align: center;*/
+/*    padding: auto;*/
+/*}*/
+
+.days-left, .earnings {
+    color: green;
+    font-size: 1.25rem;
+    font-weight: bold;
+    font-family: 'Lora', sans;
+    text-align: center;
+}
+
+#countdown, #amount-due {
+    position: relative;
+    box-sizing: border-box;
+    border: 2px solid black;
+    border-radius: 50%;
+    color: green;
+    /* height: 100px;
+    width: 100px; */
+    height: 2.75em;
+    width: 2.75em;
+    font-size: 2em;
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+    padding: auto;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+.bonus   {
+    background-image: url(../img/bonus.png);
+    background-size: 90px auto;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: 50ms;
+}
+
+.nobonus {
+    background-image: url(../img/nobonus.png);
+    background-size: 90px auto;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: 50ms;
+}
+
+
+
+.blank_trophy {
+    background-image: url(../img/blank_trophy.png);
+    background-size: 90px auto;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: 50ms;
+}
+
+
+
+
+div.completion-status > i {
+    position: relative;
+}    
+    
+
+
+
+/* _________________________________________
+    LAYOUT: 
+    ADJUSTMENTS FOR PORTRAIT MODE
+____________________________________________ */
+/*@media only screen and (orientation: portrait) {*/
+/*    .main {*/
+/*        height:94vmax;*/
+/*        width: 100vmin;*/
+/*    }    */
+
+
+/*    .nav-wrapper { */
+/*        height: 15%;*/
+/*        max-height: 100px;*/
+/*    } */
+
+    /* .vert-spacer {
+        height: 2%;
+    } */
+
+/*    .chore-list-wrapper {*/
+/*        box-sizing: border-box;*/
+/*        height:45%;*/
+/*        overflow-y: auto;*/
+/*        overflow-x:hidden;*/
+
+/*    }*/
+
+/*    .earnings-section-wrapper {*/
+/*        height:40%;*/
+        /*max-height: 350px;*/
+/*        overflow: hidden;*/
+/*    }*/
+
+/*    body {*/
+/*        box-sizing: border-box;*/
+/*        overflow: hidden;*/
+/*    }*/
+
+
+/*    .mobile-navbar-top {*/
+/*        height: 65%;*/
+/*        font-size: 1.5rem;*/
+/*    }*/
+
+/*    .mobile-navbar-job-types {*/
+/*        height: 35%;*/
+/*    }*/
+
+
+    /*.earnings-section {*/
+    /*    height: 25%;*/
+    /*}*/
+
+
+
+/*    #countdown, #amount-due {*/
+        /*height: 12vmin;*/
+        /*width: 12vmin;*/
+        /*font-size: 5vmin;*/
+/*        height: 2.5em;*/
+/*        width: 2.5em;*/
+/*        font-size: 2em;*/
+/*    }*/
+
+
+/*    .trophy-locked{*/
+/*        height: 100%;*/
+/*    }*/
+
+/*    .trophy-unlocked{*/
+/*        height: 100%;*/
+/*    }*/
+
+/*    div.completion-status > i {*/
+/*        position: relative;*/
+/*        height: 20%;*/
+/*        font-size: 0.75rem;*/
+/*    }*/
+/*} */
+/* end of portrait mode height adjustments */
