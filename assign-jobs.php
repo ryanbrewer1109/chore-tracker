@@ -375,7 +375,7 @@
 
                                 <?php
                                     for($i=0; $i < 3 ; $i++):
-                                        $category_arr = ['allowance', 'extra','penalty'];
+                                        $category_arr = ['Allowance', 'Extra','Penalty'];
                                         $value = $category_arr[$i];
                                         $selection_status = "";
                                         if(empty($_REQUEST["job_category"])): // Set default pay to 'allowance'

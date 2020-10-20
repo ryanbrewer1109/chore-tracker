@@ -216,18 +216,19 @@
                     
                     
                     <!-- Gear icon for mobile -->
+                   
+                    <div class='col-2 col-sm-2 text-left'>
                     <?php
-                        echo "<div class='col-2 col-sm-2 text-left'>";
-
-                            if($authenticated):
-                                echo "<a href='assign-jobs.php'>"
-                                ."<i class='material-icons settings-icon'>settings</i>"
-                                ."</a>";
-                            else:
-                                echo "<i class='material-icons settings-icon'>settings</i>";
-                            endif;
-                        echo "</div>";
+                        if($authenticated):
+                            echo "<a href='assign-jobs.php'>"
+                            ."<i class='material-icons settings-icon'>settings</i>"
+                            ."</a>";
+                           else:
+                            echo "<i class='material-icons settings-icon'>settings</i>";
+                        endif;
                     ?>
+                    </div>
+                    
                 </div>  <!-- End of nav.row -->
 
                 <!-- Main menu, three Job Categories -->
@@ -249,11 +250,10 @@
                     <!-- EXTRA JOBS menu item -->
                     <?php
                         // Highlight 'Extra' category if selected (this is the default category)
-                        global $job_category;
+                        global $job_category; 
                         $active_status_2 = ($job_category === 'extra') ? 'active' : '';
                         echo "<div  id = 'extra' class = 'col-4 col-sm4 text-center border-right mobile-navbar-job-type {$active_status_2}'>
-                                <p class = 'menu-job-type inline-flex text-wrap'>Extra</p>
-                        </div>";
+                                <p class = 'menu-job-type inline-flex text-wrap'>Extra</p></div>";
                     ?>
                    
                     <!-- PENALTY BOX menu item -->
@@ -262,97 +262,99 @@
                         global $job_category;
                         global $penalty_exists;
                         $active_status_3 = ($job_category === 'penalty') ? 'active' : '';
-                        echo "<div  id = 'penalty' class = 'col-4 col-sm4 text-center border-right mobile-navbar-job-type {$active_status_3}'>
-                            <p class = 'menu-job-type inline-flex text-wrap'>Penalty ";
-                        
+                        echo "<div id = 'penalty' class = 'col-4 col-sm4 text-center border-right mobile-navbar-job-type {$active_status_3}'>";
+                    ?>
+                    <p class = 'menu-job-type inline-flex text-wrap'>Penalty
+                    <?php    
                         if($penalty_exists):
-                                echo "<i class='material-icons text-danger'> error</i>";
+                            echo "<i class='material-icons text-danger'> error</i>";
                         endif;
+                    ?>
+                    </p>
 
-                        echo "
-                            </p>
-                        </div>
                 </div> <!-- End of div.row -->
                 <input type='hidden' name = 'job_category' value='{$job_category}'>";
-                    ?>
+                    
 
             </section> <!-- End of section.nav-wrapper -->
 
+            <!-- CHORE LIST and EARNINGS CONTAINER-->
+            <section  class='chore-list-earnings-container container bg-light py-3'>
+                <!-- MIDDLE SECTION: CHORE LIST -->
+                <section class='chore-list-wrapper'>
+                <?php
+                require_once 'payperiod.php';
+
+                    // Connect to SQL database
+                    $connection3 = new mysqli($_HOSTNAME, $_USERNAME, $_PASSWORD, $_DBNAME);
+                if ($connection3 -> connect_errno):
+                      $errStr= "Failed to connect to MySQL. Reason: " .  $connection3 -> connect_error;
+                      echo "alert({$errStr});";
+                      exit();
+                else:
+                    // If admin logged in, display results for all children; if child logged in, only display that child's results
+                    $sql_results_filter_by_role = ($authRole === 'admin') ?  "u.role = 'child' ": "u.user_id = '{$authUserId}' ";
+
+                    // Only display chores in the active job category (Allowance, Extra, or Penalty)
+                    $sql_results_filter_by_job_category = "a.job_category = '" . $job_category . "' ";
 
 
-            <!-- MIDDLE SECTION: CHORE LIST -->
+                    // Fetch chorelist for above current pay period
+                    $query_getchorelist = "SELECT 
+                                            first_name,
+                                            last_name, 
+                                            day_of_week,
+                                            time_due,
+                                            start_duedate,
+                                            job_name, 
+                                            job_description,
+                                            completion_date,
+                                            assignment_id,
+                                            isCompleted,
+                                            job_pay 
 
-            <section class="chore-list-wrapper container bg-light py-3">
-            <?php
-            require_once 'payperiod.php';
-            
-                // Connect to SQL database
-                $connection3 = new mysqli($_HOSTNAME, $_USERNAME, $_PASSWORD, $_DBNAME);
-        if ($connection -> connect_errno):
-              $errStr= "Failed to connect to MySQL. Reason: " .  $connection -> connect_error;
-              echo "alert({$errStr});";
-              exit();
-            else:
-                $sql_results_filter_by_role = ($authRole === 'admin') ?  "u.role = 'child' ": "u.user_id = '{$authUserId}' ";
-                $sql_results_filter_by_job_category = "a.job_category = '" . $job_category . "' ";
-                
-                                        
-                // Fetch chorelist for above current pay period
-                $query_getchorelist = "SELECT 
-                                        first_name,
-                                        last_name, 
-                                        day_of_week,
-                                        time_due,
-                                        start_duedate,
-                                        job_name, 
-                                        job_description,
-                                        completion_date,
-                                        assignment_id,
-                                        isCompleted,
-                                        job_pay 
+                                        FROM 
+                                            assignment AS a 
+                                            INNER JOIN 
+                                                user as u 
+                                                ON a.assignee_id = u.user_id 
+                                            INNER JOIN 
+                                                job AS j 
+                                                ON a.job_id = j.job_id 
+                                            INNER JOIN 
+                                                payperiod as p 
+                                                ON a.payperiod_id = p.payperiod_id 
 
-                                    FROM 
-                                        assignment AS a 
-                                        INNER JOIN 
-                                            user as u 
-                                            ON a.assignee_id = u.user_id 
-                                        INNER JOIN 
-                                            job AS j 
-                                            ON a.job_id = j.job_id 
-                                        INNER JOIN 
-                                            payperiod as p 
-                                            ON a.payperiod_id = p.payperiod_id 
+                                        WHERE 
+                                            a.payperiod_id = '{$payperiod_id}' 
 
-                                    WHERE 
-                                        a.payperiod_id = '{$payperiod_id}' 
+                                        AND 
+                                            {$sql_results_filter_by_role} 
 
-                                    AND 
-                                        {$sql_results_filter_by_role} 
+                                        AND
+                                            {$sql_results_filter_by_job_category} 
 
-                                    AND
-                                        {$sql_results_filter_by_job_category} 
-                                          
-                                    
-                                    ORDER BY 
-                                        a.assignee_id, 
-                                        a.start_duedate DESC";
-                                
+
+                                        ORDER BY 
+                                            a.assignee_id, 
+                                            a.start_duedate DESC";
+
 
                     if($DebugMode):
                         echo "<p>Retrieving chores for current user for current pay period...</p>"
                             ."<p>{$query_getchorelist}</p>";
                     $result_assignment = mysqli_query($connection3,$query_getchorelist) or die ("Error: ".mysqli_error($connection3));
                     endif;
-//                    var_dump($query_getchorelist);
+    //                    var_dump($query_getchorelist);
                     $result_assignment = mysqli_query($connection3,$query_getchorelist);
-                    
+
                     $chores_numrows = $result_assignment->num_rows;
                     if ($chores_numrows === 0):
                         global $chorelistExists;
                         $chorelistExists = false;
                         if($DebugMode):
                             echo "<p class = 'text-center'>The date and time is currently {$local_timestamp_formatted}.<br> NO CHORELIST WAS FOUND FOR CURRENT PAY PERIOD  BEGINNING {$sqlStartDate} & ENDING {$sqlEndDate}.</p>";
-                            echo "<p>The following query returned no results:<br>{$query_getchorelist}</p>";
+                            echo "<p>No chores have been assigned yet for this payperiod (based on the following query: <br>{$query_getchorelist}</p>";
                         endif;
                     else:
                         global $chorelistExists;
@@ -361,17 +363,20 @@
                             echo "<br><br>SUCCESS! FETCHING CHORES...";
                             echo "<p>The following query returned some results:<br>{$query_getchorelist}</p>";
                         endif;
-                        
+
+                        $arr_index_num_chores = 0; // used to advance index of $arr_num_chores when finished 
+                        $arr_num_chores = []; // stores number of chores for each child
                         $prev_name = ""; // Helps determine whether to display child's name before a chore (prevents redundancies)
+
                         while ($row = $result_assignment -> fetch_array(MYSQLI_ASSOC)):
-                        // while ($row = $result_assignment -> fetch_assoc()):
+                        // while ($row = $result_assignment -> fetch_assoc()): // alternative way of executing above command
                             $counter++;
                             $this_first_name = $row['first_name'];
                             $this_last_name = $row['last_name'];
                             $this_child = $this_first_name." ".$this_last_name;
                             $thisChoreName = "choreID_".$counter;
                             $thisChoreValue = $row['assignment_id'];
-                            $job_description = $row["job_description"];
+                            $job_description = $row["job_description"]  ;
                             $job_name = $row["job_name"];
                             $label_name = "label_".$counter;
                             $checkmark_name =  "checkmark_".$counter;
@@ -387,7 +392,7 @@
                             $due_day = $row["day_of_week"];
                             $duetime_str = $row["time_due"]; // Format in DB is text: hh:mm:ssAM                            
                             $due_timestamp = strtotime("{$due_day} {$duetime_str} this week"); // Finds the requested day of the week prior to the next Sunday (i.e. prior to "this [upcoming] week")
-                            
+
                             $duedate_display = date("h:ia, l M. jS", $due_timestamp);
 
                             // Following hidden input field captures 
@@ -398,7 +403,7 @@
                                     id = \"{$thisChoreName}\" 
                                     name = \"{$thisChoreName}\" 
                                     value = \"{$thisChoreValue}\">
-                                    
+
                                   <!--  ==============================
                                         CHILD NAME BANNER (Admin view)
                                         ============================== -->
@@ -412,6 +417,11 @@
                                         {$this_child}<br>
                                     </div>
                                 </div>";
+                                if($prev_name !== ''): // Increment array index each time a new name displays (i.e., when >1 child)
+                                    global $arr_index_num_chores;
+                                    $arr_index_num_chores++;
+
+                                endif;
                             endif;
 
                             $prev_name = $this_child;
@@ -469,38 +479,38 @@
                             "; // End of Double quote section                   
 
 
-                                        echo "<label id=\"{$label_name}\">";
-                                            // Declare some local variables
-                                            $value = 0;
-                                            $checkmarkClass = '';
-                                            $checkboxStatus = '';
+                            echo "<label id=\"{$label_name}\">";
+                                // Declare some local variables
+                                $value = 0;
+                                $checkmarkClass = '';
+                                $checkboxStatus = '';
 
-                                            // Show correct CSS, value, and progress
-                                            // if chore has been completed
-                                            if($isCompleted):
-                                                global $earnings;
-                                                $value = $job_pay; 
-                                                $checkmarkClass = "text-success";
-                                                $checkboxStatus = "checked";
-                                                // increases green checkmarks
-                                                // on progress meter
-                                                $total_complete += 1; 
-                                                $completionClass = "text-success";
-                                                $earnings += $value;
+                                // Show correct CSS, value, and progress
+                                // if chore has been completed
+                                if($isCompleted):
+                                    global $earnings;
+                                    $value = $job_pay; 
+                                    $checkmarkClass = "text-success";
+                                    $checkboxStatus = "checked";
+                                    // increases green checkmarks
+                                    // on progress meter
+                                    $total_complete += 1; 
+                                    $completionClass = "text-success";
+                                    $earnings += $value;
 
-                                            // Show correct CSS, value, and progress
-                                            // if chore has NOT been completed
-                                            else:                                       $value= 0;
-                                                $checkmarkClass = "text-muted";
-                                                $checkboxStatus = " ";
-                                                $total_incomplete += 1; 
-                                                //increase gray checkmarks
-                                                // on progress meter;
-                                                $completionClass = "d-none";
+                                // Show correct CSS, value, and progress
+                                // if chore has NOT been completed
+                                else:                                       $value= 0;
+                                    $checkmarkClass = "text-muted";
+                                    $checkboxStatus = " ";
+                                    $total_incomplete += 1; 
+                                    //increase gray checkmarks
+                                    // on progress meter;
+                                    $completionClass = "d-none";
 
-                                            endif;
+                                endif;
 
-                                        echo "
+                            echo "
 
                                     <!--    ===============================
                                             CHECKBOX
@@ -551,10 +561,10 @@
 
                                             <p class=\"time-stamp text-left  {$completionClass}\">
                                             Completed ";
-                                        if($completion_date != null){
+                                        if($completion_date != null ):
                                             $completion_date_formatted = date_format($completion_date, 'm-d-y @ h:i A'); // Formats date in user's timezone
                                             echo "{$completion_date_formatted}";
-                                        }
+                                        endif;
                                         echo "</p>
                                         </div>
                                         <div class=\"col-3 col-sm-3\"> </div>
@@ -565,157 +575,137 @@
                                          <p class = \"text-success job-pay\">Value: $ {$job_pay}</p>
                                         </div>
 
-                                    </div> <!--  End div.row  -->    
-                                    
-                               "; // End of double quote section
-                                         
-                <!-- =========================================== -->
-                <!-- Row for Days Left, Trophy image, and Earnings -->
-                <!-- =========================================== -->
-                <div class="row earnings-section bg-white">
-                    <!-- =========================================== -->
-                    <!-- Days Left -->
-                    <!-- =========================================== -->
-                    <div class="col-4 col-sm-4">
-                        <p class="text-nowrap days-left mb-1">Days Left</p>
-                        <div id="countdown" class="px-3 py-3 my-1">
-                            <?php
-                                echo $daysLeft;
-                            ?>
-                        </div>                
-                    </div>
-                    <!-- =========================================== -->
-                    <!-- Trophy img -->
-                    <!-- =========================================== -->
-                    <div id="trophy-img" class="col-4 col-sm-4 my-2 
-                        
-            <?php
-                            
-                            global $chorelistExists;
-                            if ($chorelistExists):
-                                // Adds either bonus or nobonus class
-                                if($total_incomplete == 0 && $total_complete > 0):
-                                    echo 'bonus">';
-                                else:
-                                    echo 'nobonus">';
-                                endif;
-                            else:
-                                echo 'blank_trophy">';
-                            endif;
-                            
-                                ?> 
-                    </div>  <!-- End of div.col-4. ol-sm-4  -->
-                
-                    <!-- =========================================== -->
-                    <!-- EARNINGS -->
-                    <!-- =========================================== -->
-            <?php
-
-                    global $counter;
-                    global $earnings;
-                    global $extraEarnings;
-                    global $totalEarnings;
-                    $displayed_multiplier = "";
-                    if($counter > 0 AND $total_complete == $counter):
-                        $bonusMultiplier = 2; // Doubles allowance earnings
-                        // Activates each week if all allowance chores
-                        // are completed by their due dates
-                        $displayed_multiplier = " (2x)";
-                    endif;
-                    $totalEarnings = $earnings * $bonusMultiplier;
-                    
-                    echo 
-                    "<div class='col-4 col-sm-4'>
-                          <p class='earnings mb-1'>Earnings{$displayed_multiplier}</p>
-                        <div id='amount-due' class='px-3 py-3 my-1'>"."$".$totalEarnings."
-                            </div>
-                    </div>  <!-- End of final column group (div.earnings)  -->
-
-                </div> <!-- End of div .row .earnings-section  -->";
-                ?>
-
-                <!-- =========================================== -->
-                <!-- Row to show bonus status under trophy image -->
-                <!-- =========================================== -->
-                <div class= "row bg-dark pt-1" > 
-                
-                    <div class="d-flex container-fluid 
-                                justify-content-center bg-dark">
-                <!-- =========================================== -->
-                <!-- PROGRESS METER (Checkmarks under trophy image) -->
-                <!-- =========================================== -->
-            <?php
-                    for ($i = 0; $i < $total_complete; $i++):
-                         echo "<i class=\"material-icons text-success\">check_circle</i>";
-                    endfor;
-                        
-                    for ($i = 0; $i < $total_incomplete; $i++):
-                        echo "<i class=\"material-icons text-muted\">check_circle</i>";
-                    endfor;
-                    
-                    // Reset form values to allow refresh without resubmit
-
-                    
-            ?>
-                </div>  <!-- End of div.d-flex  -->
-            </div>  <!-- End of .row .bg-dark  -->
-
-                                         
-                                         
-                                         
-                                         
-                                         
-                                         
-                                         
-                                         
+                                    </div> <!--  End div.row  -->";
                         endwhile;
-
 
                         // Include $counter in $_POST data
                         echo "<input type = \"hidden\" id = \"form_counter\"  
                               name = \"form_counter\" value = \"{$counter}\">";
-                    endif;
-                    
-                    //Free up the result memory and close the connection
-//                    $result_assignment-> mysqli_free_result();  // check variable name and syntax
-                    $connection3 -> close();
-                endif;
-                ?>
-            
-            </section> <!--  End of middle section -->
-            
-            <!-- =========================================== -->
-            <!-- BOTTOM SECTION: EARNINGS MODULE -->
-            <!-- =========================================== -->
-            
-            <section class="earnings-section-wrapper container text-center bg-light">
 
+                        //Free up the result memory and close the connection
+    //                    $result_assignment-> mysqli_free_result();  // check variable name and syntax
+                        $connection3 -> close();
+                    endif; // (numrows !== 0)
+                endif; // (connection successful)
+
+                ?>
+                </section> <!--  End of middle section -->
+                
                 <!-- =========================================== -->
-                <!-- Row for Save & Update Button-->
+                <!-- BOTTOM SECTION: EARNINGS MODULE -->
                 <!-- =========================================== -->
-                <div class ="row bg-light pb-3 border-bottom">
-                    <div class="col- col-sm- center-btn pt-3">
-                         <button type = "submit" name="submit-tasklist" value ="save"  class="btn btn-success text-nowrap update-btn">
+                <section class='earnings-section-wrapper container text-center bg-light'>
+                <?php
+                    echo "
+                        <!-- =========================================== -->
+                        <!-- Row for Days Left, Trophy image, and Earnings -->
+                        <!-- =========================================== -->
+                        <div class='row earnings-section bg-white'>
+                            <!-- =========================================== -->
+                            <!-- Days Left -->
+                            <!-- =========================================== -->
+                            <div class='col-4 col-sm-4'>
+                                <p class='text-nowrap days-left mb-1'>Days Left</p>
+                                <div id='countdown' class='px-3 py-3 my-1'>
+                                    {$daysLeft}
+                                </div>                
+                            </div>
+                            <!-- =========================================== -->
+                            <!-- Trophy img -->
+                            <!-- =========================================== -->
+                            <div id='trophy-img' class='col-4 col-sm-4 my-2
+                            ";
+                                global $chorelistExists;
+                                if ($chorelistExists):
+                                    // Adds either bonus or nobonus class
+                                    if($total_incomplete == 0 && $total_complete > 0):
+                                        echo "bonus'>";
+                                    else:
+                                        echo " nobonus'>";
+                                    endif;
+                                else:
+                                    echo "blank_trophy'>";
+                                endif;
+                            echo " 
+
+                            </div>  <!-- End of div.col-4. ol-sm-4  -->
+
+                            <!-- =========================================== -->
+                            <!-- EARNINGS -->
+                            <!-- =========================================== -->
+                            ";
+
+                            global $counter;
+                            global $earnings;
+                            global $extraEarnings;
+                            global $totalEarnings;
+                            $displayed_multiplier = "";
+                            if($counter > 0 AND $total_complete == $counter):
+                                $bonusMultiplier = 2; // Doubles allowance earnings
+                                // Activates each week if all allowance chores
+                                // are completed by their due dates
+                                $displayed_multiplier = " (2x)";
+                            endif;
+                            $totalEarnings = $earnings * $bonusMultiplier;
+
+                            echo 
+                            "<div class='col-4 col-sm-4'>
+                                  <p class='earnings mb-1'>Earnings{$displayed_multiplier}</p>
+                                <div id='amount-due' class='px-3 py-3 my-1'>"."$".$totalEarnings."
+                                    </div>
+                            </div>  <!-- End of final column group (div.earnings)  -->
+
+                            </div> <!-- End of div .row .earnings-section  -->
+
+                            <!-- =========================================== -->
+                            <!-- ROW: PROGRESS METER (Checkmarks under trophy image) -->
+                            <!-- =========================================== -->
+                            <div class= 'row bg-dark pt-1' >
+
+                                <div class='d-flex container-fluid 
+                                            justify-content-center bg-dark'>";
+
+                                for ($i = 0; $i < $total_complete; $i++):
+                                     echo "<i class=\"material-icons text-success\">check_circle</i>";
+                                endfor;
+
+                                for ($i = 0; $i < $total_incomplete; $i++):
+                                    echo "<i class=\"material-icons text-muted\">check_circle</i>";
+                                endfor;
+
+                            echo "
+                                </div>  <!-- End of div.d-flex  -->
+                            </div>  <!-- End of .row .bg-dark  -->";
+                ?>
+                </section> <!-- End of Earnings Section Wrapper -->
+            </section> <!-- End of container for CHORELIST and EARNINGS  -->
+            
+            <section class = 'container'>  <!-- Save button  -->
+            <!-- =========================================== -->
+            <!-- Row for Save & Update Button-->
+            <!-- =========================================== -->
+                <div class ='row bg-light pb-3 border-bottom'>
+                    <div class='col- col-sm- center-btn pt-3'>
+                         <button type = 'submit' name='submit-tasklist' value ='save'  class='btn btn-success text-nowrap update-btn'>
                                 Save & Update
                          </button>
                         <p>        
-                            <label class = "d-none">Page Loaded Timestamp: <input 
-                                id = "localTimestamp"
-                                type = "text" 
-                                name = "local_timestamp" 
-                                
+                            <label class = 'd-none'>Page Loaded Timestamp: <input 
+                                id = 'localTimestamp'
+                                type = 'text'
+                                name = 'local_timestamp'
+
                                 >
-                        
+
                             </label>        
                         </p>
                     </div>  <!-- End div.col-.col-sm- .center-btn -->  
-                    
+
                 </div>   <!-- End row -->
-
-
-            </section> 
+            </section>
+            
             <!-- End of earnings section-wrapper -->
         </div> <!-- End of div.main -->
         </form>
     </body>
-</html>
+</html>    

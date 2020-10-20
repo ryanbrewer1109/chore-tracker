@@ -145,10 +145,10 @@ label > input + i:hover {
     height: 2%;
 } */
 
-.chore-list-wrapper {
+.chore-list-earnings-container {
     position: relative;
     box-sizing: border-box;
-    height: 50%;
+    height: 85%;
     overflow-y: auto;
     overflow-x:hidden;
     /* border-bottom: 1px solid black; */
@@ -156,10 +156,14 @@ label > input + i:hover {
 
 .earnings-section-wrapper {
     box-sizing: border-box;
-    position: relative;
-    height: 35%; 
+    position: sticky;
+    /*height: 35%;*/ 
+    bottom:-10px;;
 }
 
+.earnings-section:last-child {
+    display: block;
+}
 
 body {
     box-sizing: border-box;
