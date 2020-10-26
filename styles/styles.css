@@ -212,7 +212,7 @@ body {
 
  .mobile-navbar-top {
     position: relative;
-    height: 40%;
+    height: 50%;
     font-weight: bold;
     text-align: center;
     font-size: 1rem;
@@ -222,7 +222,7 @@ body {
     position: relative;
     box-sizing: border-box;
     font-size: calc(2vmin + 0.25rem);
-    height: 60%;
+    height: 50%;
     font-weight: 400;
     color: #5a5a5a;
     border-top: 1px solid blue;

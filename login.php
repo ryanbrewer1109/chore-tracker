@@ -43,7 +43,8 @@
 
         elseif (empty($_REQUEST["user"]) OR empty($_REQUEST["pw"])): 
             echo " <div class=\"alert alert-danger\" role=\"alert\">
-            Incomplete submission. Enter your email and password.</div>";        
+            Incomplete submission. Enter your email and password.</div>";         
+        
         else:
             // see notes in include.php re: get_formdata function
             $email = get_formdata($connection, "user"); // selected user

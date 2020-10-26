@@ -41,12 +41,15 @@
                     $authLastName = $_SESSION["auth_last_name"] ?? "ERROR: No Last name not found";
                     $authRole = $_SESSION["auth_role"] ?? "ERROR: Role not found";
                     $default_Timezone = 'Greenwich';
+                    $local_timestamp;
+                    $local_timestamp_formatted;
+                    $noChildSelected = FALSE;
 
-                    $job_category = $_SESSION["job_category"] ?? "allowance";
+                    $job_category = $_REQUEST["job_category"] ?? "allowance";
 
                 //    $authTimeZone = (isset($_SESSION["auth_timezone"]) && timezoneID($authTimeZone)) ? $_SESSION["auth_timezone"]: "$UTC_timezone"; // Sets user's timezone if selected AND valid; else, defaults to UTC
                     $authTimeZone = $default_Timezone;
-                //    $localTime = $_SESSION["local_timestamp"] ?? "NONE FOUND";   // This approach attempts to use JS to retrieve and use local tim and stores in $_SESSION. Problem: This means the time retrieved from $_SESSION is not the actual current time
+                    $localTime = $_SESSION["local_timestamp"] ?? "NONE FOUND";   // Time from when page was loaded, based on payperiod.php
                     $DebugMode = false;
                     $daysLeft;
                     $chorelistExists;
@@ -57,6 +60,7 @@
                     $_PASSWORD = $_SESSION['db_pw'];
                     $_DBNAME = $_SESSION['db_table'];
                     $payperiod_id = $_SESSION['current_payperiod_id'] ?? "CURRENT PAY PERIOD UNKNOWN";
+                    $payperiod_start = $_SESSION['current_payperiod_start_date'];
 
                     $total_complete = 0;
                     $total_incomplete = 0;
@@ -67,7 +71,7 @@
                     $bonusMultiplier = 1;
                     $totalEarnings = $earnings + $extraEarnings;
                     $local_timestamp;
-                    $display_users_arr = [];
+                    $_SESSION['display_users_arr'] = [];
 
 
                     if($DebugMode) {
@@ -92,17 +96,24 @@
                             $name = $row_child['first_name'];
                             $id = $row_child['user_id'];
                             $this_chkbx = "user_chkbx_".($index_counter+1);
-                            global $display_users_arr;
+                            $_SESSION['display_users_arr'];
 
                             // Update array with values posted to $_REQUEST, if available
-                            $display_users_arr[$index_counter][0] = $name;
-                            $display_users_arr[$index_counter][1] = $id;
+                            $_SESSION['display_users_arr'][$index_counter][0] = $name;
+                            $_SESSION['display_users_arr'][$index_counter][1] = $id;
+                            
+                            
+                            
+                            
                             
                             //  Logic here determines the verbiage used in SQL query to get users' chorelists
-                            $display_users_arr[$index_counter][2] = 'on';
+                            $_SESSION['display_users_arr'][$index_counter][2] = 'on';
                             if(empty($_REQUEST[$this_chkbx])):
+                                
                                 if(!empty($_REQUEST['submit-tasklist'])):
-                                    $display_users_arr[$index_counter][2] = null;
+                                   
+                                    $_SESSION['display_users_arr'][$index_counter][2] = NULL;
+                                    echo "<script>console.log('Save button has been clicked, and {$this_chkbx} is not checked.')</script>";
                                 endif;
                             endif;                          
                             $index_counter++;
@@ -136,7 +147,7 @@
                             global $penalty_exists;
                             $penalty_exists = false;
                             if($DebugMode):
-                                echo "<p>No penalties were found for this payperiod.</p>";
+                                echo "<p>No penalties were found for current payperiod.</p>";
                             endif;
                         else:
                             global $penalty_exists;
@@ -310,10 +321,10 @@
                     <div class='row admin-show-accts bg-light pt-1 border-top border-bottom '>
                         <div class='col-12 col-sm-12'>                        
                             <span class='font-weight-bold'>Select chore accounts to display:</span>";
-                            global $display_users_arr;
-                            for($i = 0;  $i < count($display_users_arr); $i++):
-                                $child_name = $display_users_arr[$i][0];
-                                $child_id = $display_users_arr[$i][1];
+                            $_SESSION['display_users_arr'];
+                            for($i = 0;  $i < count($_SESSION['display_users_arr']); $i++):
+                                $child_name = $_SESSION['display_users_arr'][$i][0];
+                                $child_id = $_SESSION['display_users_arr'][$i][1];
                                 // Hidden field to post user ID
                                 $this_user = 'user_id_'.($i+1);
                                 echo "<input type='hidden' name = '{$this_user}' value= {$child_id}>";
@@ -323,7 +334,7 @@
                                 echo "<label class = 'px-3'>{$child_name}
                                 <input type='checkbox' name = '{$this_chkbx}'}'
                                 "; 
-                                if($display_users_arr[$i][2]==='on'): // Per earlier logic to construct $display_users_arr, checkboxes default to checked state
+                                if($_SESSION['display_users_arr'][$i][2]==='on'): // Per earlier logic to construct $_SESSION['display_users_arr'], checkboxes default to checked state
                                     echo " checked></label>";
                                 else:
                                     echo "></label>";
@@ -361,38 +372,52 @@
 
                         // If admin logged in, display results for all children; if child logged in, only display that child's results
 //                            $sql_results_filter_by_role = ($authRole === 'admin') ?  "u.role = 'child' ": "u.user_id = '{$authUserId}' ";
-                        $sql_results_filter_by_id;
-                        $sql_user_ids = "";
-                        $first_iteration = true;
-                        $arr_length = count($display_users_arr);
-                        for($i = 0; $i < $arr_length; $i++):
-                            echo "<script>console.log('The array display_users_arr includes ".count($display_users_arr)." children.')</script>";
-                            echo "<script>console.log('The checkbox status for ".$display_users_arr[$i][0]." is: ".$display_users_arr[$i][2]."')</script>";
-    
-                            if($display_users_arr[$i][2] === 'on'):
-                                if($first_iteration):
-                                    $sql_user_ids .=$display_users_arr[$i][1];
+                            
+                            $sql_results_filter_by_id='';
+                            $sql_user_ids = NULL;
+                            $first_iteration = true;
+                            $arr_length = count($_SESSION['display_users_arr']);
+                            for($i = 0; $i < $arr_length; $i++):
+                                echo "<script>console.log('The array display_users_arr includes ".count($_SESSION['display_users_arr'])." children.')</script>";
+                                echo "<script>console.log('The checkbox status for ".$_SESSION['display_users_arr'][$i][0]." is: ".$_SESSION['display_users_arr'][$i][2]."')</script>";
+
+                                if($_SESSION['display_users_arr'][$i][2] === 'on'):
+                                    if(!$first_iteration): // No comma preceding the first user id
+                                        $sql_user_ids .= ", ";
+                                    endif;
+                                    $sql_user_ids .=$_SESSION['display_users_arr'][$i][1];
                                     $first_iteration = false;
-                             
+
                                 else:
-                                    $sql_user_ids .= ", ".$display_users_arr[$i][1];
+                                    echo "<script>console.log('Chorelist query excluding chores for {$_SESSION['display_users_arr'][$i][0]}.');</script>";
+                                    $sql_user_ids .= "";
                                 endif;
-                            endif;    
-                        endfor;
-                        
-
-                        // Determine which users to include in results
-                        if($authRole === 'child'):
-                            $sql_results_filter_by_id = "AND u.user_id = '{$authUserId}' ";
-                        else:
-                            if($sql_user_ids !== ''):
-                                $sql_results_filter_by_id = "AND user_id IN ({$sql_user_ids})";
+                            endfor;
+                            if($sql_user_ids===''):
+                                global $noChildSelected;
+                                $noChildSelected = TRUE;
+                                if($DebugMode):
+                                    echo "<script>alert('noChildSelected = ".$noChildSelected."')</script>";
+                                endif;
+                                else:
+                                global $noChildSelected;
+                                if($DebugMode):
+                                    echo "<script>alert('sql_user_ids =  ".$sql_user_ids." and noChildSelected =  ".$noChildSelected."')</script>";
+                                endif;
                             endif;
-                        endif;
+                            // Determine which users to include in results
+                            if($authRole === 'child'):
+                                $sql_results_filter_by_id = "AND u.user_id = '{$authUserId}' ";
+                            else:
+                                if($sql_user_ids !== ''):
+                                    $sql_results_filter_by_id = "AND user_id IN ({$sql_user_ids})";
+                                else: $sql_results_filter_by_id = '';
+                                endif;
+                            endif;
 
 
 
-                            // Fetch chorelist for above current pay period
+                            // Query to fetch chorelist for selected children for current pay period
                             $query_getchorelist = "SELECT 
                                                     first_name,
                                                     last_name, 
@@ -435,248 +460,257 @@
                                 echo "<p>Retrieving chores for current user for current pay period...</p>"
                                     ."<p>{$query_getchorelist}</p>";
                             endif;
-
-                            $result_assignment = mysqli_query($connection3,$query_getchorelist) or die ("Error: ".mysqli_error($connection3));
-            //                    var_dump($query_getchorelist);
-
-                            $chores_numrows = $result_assignment->num_rows;
-                            if ($chores_numrows === 0):
-                                global $chorelistExists;
-                                $chorelistExists = false;
-                                if($DebugMode):
-                                    echo "<p class = 'text-center'>The date and time is currently {$local_timestamp_formatted}.<br> NO CHORELIST WAS FOUND FOR CURRENT PAY PERIOD  BEGINNING {$sqlStartDate} & ENDING {$sqlEndDate}.</p>";
-                                    echo "<p>No chores have been assigned yet for this payperiod (based on the following query: <br>{$query_getchorelist}</p>";
-                                endif;
+                            global $noChildSelected;
+                            if($noChildSelected):
+                                echo " <div class=\"alert alert-danger\" role=\"alert\">"
+                                . "Select at least one child's name, then click Save button to view current chorelist.</div>";   
                             else:
-                                global $chorelistExists;
-                                $chorelistExists = true;
-                                if($DebugMode): 
-                                    echo "<br><br>SUCCESS! FETCHING CHORES...";
-                                    echo "<p>The following query returned some results:<br>{$query_getchorelist}</p>";
-                                endif;
+                                $result_assignment = mysqli_query($connection3,$query_getchorelist) or die ("Error: ".mysqli_error($connection3));
+                //                    var_dump($query_getchorelist);
 
-                                $arr_index_num_chores = 0; // used to advance index of $arr_num_chores when finished 
-                                $arr_num_chores = []; // stores number of chores for each child
-                                $prev_name = ""; // Helps determine whether to display child's name before a chore (prevents redundancies)
-
-                                while ($row = $result_assignment -> fetch_array(MYSQLI_ASSOC)):
-                                // while ($row = $result_assignment -> fetch_assoc()): // alternative way of executing above command
-                                    $counter++;
-                                    $this_first_name = $row['first_name'];
-                                    $this_last_name = $row['last_name'];
-                                    $this_child = $this_first_name." ".$this_last_name;
-                                    $thisChoreName = "choreID_".$counter;
-                                    $thisChoreValue = $row['assignment_id'];
-                                    $job_description = $row["job_description"]  ;
-                                    $job_name = $row["job_name"];
-                                    $label_name = "label_".$counter;
-                                    $checkmark_name =  "checkmark_".$counter;
-                                    $checkbox_name = "checkbox_".$counter;
-                                    $isCompleted = $row["isCompleted"];
-                                    $completion_date = new DateTime("now", new DateTimeZone($authTimeZone));
-
-
-                                    $completionClass = "";
-                                    $job_pay = $row["job_pay"];
-                                    $job_pay_dollars = "$".$job_pay;
-
-                                    $due_day = $row["day_of_week"];
-                                    $duetime_str = $row["time_due"]; // Format in DB is text: hh:mm:ssAM                            
-                                    $due_timestamp = strtotime("{$due_day} {$duetime_str} this week"); // Finds the requested day of the week prior to the next Sunday (i.e. prior to "this [upcoming] week")
-
-                                    $duedate_display = date("h:ia, l M. jS", $due_timestamp);
-
-                                    // Following hidden input field captures 
-                                    // assignment_id of this chore so it can be 
-                                    // passed to form data array ($_GET or $_POST)
-
-                                    echo "<input type = \"hidden\"  
-                                            id = \"{$thisChoreName}\" 
-                                            name = \"{$thisChoreName}\" 
-                                            value = \"{$thisChoreValue}\">
-
-                                          <!--  ==============================
-                                                CHILD NAME BANNER (Admin view)
-                                                ============================== -->
-                                            ";                         
-
-                                    if(($authRole == 'admin') AND ($prev_name !== $this_child OR $prev_name == '')):
-                                        echo "
-                                        <!-- Print each child's name on top row of their chore list  -->
-                                        <div class='row'>
-                                            <div class='col-12 bg-warning text-black py-1 mb-3 text-center font-weight-bold'>
-                                                {$this_child}<br>
-                                            </div>
-                                        </div>";
-                                        if($prev_name !== ''): // Increment array index each time a new name displays (i.e., when >1 child)
-                                            global $arr_index_num_chores;
-                                            $arr_index_num_chores++;
-
-                                        endif;
+                                $chores_numrows = $result_assignment->num_rows;
+                                global $payperiod_start;
+                                if ($chores_numrows === 0):
+                                    global $chorelistExists;
+                                    $chorelistExists = false;
+                                    if($DebugMode):
+                                        global $local_timestamp_formatted;
+                                        echo "<p class = 'text-center'>The date and time is currently {$local_timestamp_formatted}.<br> NO CHORELIST WAS FOUND FOR CURRENT PAY PERIOD  BEGINNING {$sqlStartDate} & ENDING {$sqlEndDate}.</p>";
+                                        echo "<p>No results from the following query: <br>{$query_getchorelist}</p>";
+                                    endif;
+                                    echo " <div class=\"alert alert-danger\" role=\"alert\">"
+                                    . "No chores have been assigned yet for current payperiod beginning {$payperiod_start}.</div>";   
+                                else:
+                                    global $chorelistExists;
+                                    $chorelistExists = true;
+                                    if($DebugMode): 
+                                        echo "<br><br>SUCCESS! FETCHING CHORES...";
+                                        echo "<p>The following query returned some results:<br>{$query_getchorelist}</p>";
                                     endif;
 
-                                    $prev_name = $this_child;
+                                    $arr_index_num_chores = 0; // used to advance index of $arr_num_chores when finished 
+                                    $arr_num_chores = []; // stores number of chores for each child
+                                    $prev_name = ""; // Helps determine whether to display child's name before a chore (prevents redundancies)
 
-                                    echo "
-                                          <!--  ==========
-                                                INFO ICON
-                                               =========== -->           
-                                    <div class=\"row chore\">
-                                        <div class=\"col-2 col-sm-2 text-right\">
-                                            <i 
-                                                class=\"material-icons
-                                                py-3 text-info info-icon\">info</i>
-                                        </div>
-
-
-                                          <!--  ======================
-                                                TASK CONTAINER (BUBBLE)
-                                               ======================= -->
-                                        <!-- This column space reserved for task bubble -->
-                                        <div class=\"col-7 col-sm-7\">
-                                            <div class=\"row task-bubble\">
-                                                <div class=\"col-11 col-sm-11\">
-
-                                            <!--    ====================
-                                                    DUE DATE & CHORE NAME
-                                                    ==================== -->
-                                                    <!-- DUE DATE -->
-                                                       <p class=\"text-primary due-date\">
-                                                        Due by {$duedate_display}</p>
+                                    while ($row = $result_assignment -> fetch_array(MYSQLI_ASSOC)):
+                                    // while ($row = $result_assignment -> fetch_assoc()): // alternative way of executing above command
+                                        $counter++;
+                                        $this_first_name = $row['first_name'];
+                                        $this_last_name = $row['last_name'];
+                                        $this_child = $this_first_name." ".$this_last_name;
+                                        $thisChoreName = "choreID_".$counter;
+                                        $thisChoreValue = $row['assignment_id'];
+                                        $job_description = $row["job_description"]  ;
+                                        $job_name = $row["job_name"];
+                                        $label_name = "label_".$counter;
+                                        $checkmark_name =  "checkmark_".$counter;
+                                        $checkbox_name = "checkbox_".$counter;
+                                        $isCompleted = $row["isCompleted"];
+                                        $completion_date = new DateTime("now", new DateTimeZone($authTimeZone));
 
 
-                                                    <!-- JOB PAY -->
-                                                    <p class=\"text-truncate text-left\">
-                                                        {$job_name}</p>
+                                        $completionClass = "";
+                                        $job_pay = $row["job_pay"];
+                                        $job_pay_dollars = "$".$job_pay;
 
-                                            <!--    =============
-                                                    CHORE DETAILS
-                                                    ============= -->
-                                                    <p class=
-                                                            \"text-wrap 
-                                                            py-1 details
-                                                            text-primary
-                                                            d-none
-                                                            \">
-                                                        {$job_description}</p>
+                                        $due_day = $row["day_of_week"];
+                                        $duetime_str = $row["time_due"]; // Format in DB is text: hh:mm:ssAM                            
+                                        $due_timestamp = strtotime("{$due_day} {$duetime_str} this week"); // Finds the requested day of the week prior to the next Sunday (i.e. prior to "this [upcoming] week")
 
-                                                </div> <!-- End job name/details text -->    
-                                            <!--    ===============================
-                                                    CHECKBOX LABEL & INITIAL VALUES
-                                                    =============================== -->
-                                                <div class=\"col-1 col-sm-1 text-right 
-                                                        py-2\">
+                                        $duedate_display = date("h:ia, l M. jS", $due_timestamp);
 
-                                    "; // End of Double quote section                   
+                                        // Following hidden input field captures 
+                                        // assignment_id of this chore so it can be 
+                                        // passed to form data array ($_GET or $_POST)
 
+                                        echo "<input type = \"hidden\"  
+                                                id = \"{$thisChoreName}\" 
+                                                name = \"{$thisChoreName}\" 
+                                                value = \"{$thisChoreValue}\">
 
-                                    echo "<label id=\"{$label_name}\">";
-                                        // Declare some local variables
-                                        $value = 0;
-                                        $checkmarkClass = '';
-                                        $checkboxStatus = '';
+                                              <!--  ==============================
+                                                    CHILD NAME BANNER (Admin view)
+                                                    ============================== -->
+                                                ";                         
 
-                                        // Show correct CSS, value, and progress
-                                        // if chore has been completed
-                                        if($isCompleted):
-                                            global $earnings;
-                                            $value = $job_pay; 
-                                            $checkmarkClass = "text-success";
-                                            $checkboxStatus = "checked";
-                                            // increases green checkmarks
-                                            // on progress meter
-                                            $total_complete += 1; 
-                                            $completionClass = "text-success";
-                                            $earnings += $value;
+                                        if(($authRole == 'admin') AND ($prev_name !== $this_child OR $prev_name == '')):
+                                            echo "
+                                            <!-- Print each child's name on top row of their chore list  -->
+                                            <div class='row'>
+                                                <div class='col-12 bg-warning text-black py-1 mb-3 text-center font-weight-bold'>
+                                                    {$this_child}<br>
+                                                </div>
+                                            </div>";
+                                            if($prev_name !== ''): // Increment array index each time a new name displays (i.e., when >1 child)
+                                                global $arr_index_num_chores;
+                                                $arr_index_num_chores++;
 
-                                        // Show correct CSS, value, and progress
-                                        // if chore has NOT been completed
-                                        else:                                       $value= 0;
-                                            $checkmarkClass = "text-muted";
-                                            $checkboxStatus = " ";
-                                            $total_incomplete += 1; 
-                                            //increase gray checkmarks
-                                            // on progress meter;
-                                            $completionClass = "d-none";
-
+                                            endif;
                                         endif;
 
-                                    echo "
+                                        $prev_name = $this_child;
 
+                                        echo "
+                                              <!--  ==========
+                                                    INFO ICON
+                                                   =========== -->           
+                                        <div class=\"row chore\">
+                                            <div class=\"col-2 col-sm-2 text-right\">
+                                                <i 
+                                                    class=\"material-icons
+                                                    py-3 text-info info-icon\">info</i>
+                                            </div>
+
+
+                                              <!--  ======================
+                                                    TASK CONTAINER (BUBBLE)
+                                                   ======================= -->
+                                            <!-- This column space reserved for task bubble -->
+                                            <div class=\"col-7 col-sm-7\">
+                                                <div class=\"row task-bubble\">
+                                                    <div class=\"col-11 col-sm-11\">
+
+                                                <!--    ====================
+                                                        DUE DATE & CHORE NAME
+                                                        ==================== -->
+                                                        <!-- DUE DATE -->
+                                                           <p class=\"text-primary due-date\">
+                                                            Due by {$duedate_display}</p>
+
+
+                                                        <!-- JOB PAY -->
+                                                        <p class=\"text-truncate text-left\">
+                                                            {$job_name}</p>
+
+                                                <!--    =============
+                                                        CHORE DETAILS
+                                                        ============= -->
+                                                        <p class=
+                                                                \"text-wrap 
+                                                                py-1 details
+                                                                text-primary
+                                                                d-none
+                                                                \">
+                                                            {$job_description}</p>
+
+                                                    </div> <!-- End job name/details text -->    
+                                                <!--    ===============================
+                                                        CHECKBOX LABEL & INITIAL VALUES
+                                                        =============================== -->
+                                                    <div class=\"col-1 col-sm-1 text-right 
+                                                            py-2\">
+
+                                        "; // End of Double quote section                   
+
+
+                                        echo "<label id=\"{$label_name}\">";
+                                            // Declare some local variables
+                                            $value = 0;
+                                            $checkmarkClass = '';
+                                            $checkboxStatus = '';
+
+                                            // Show correct CSS, value, and progress
+                                            // if chore has been completed
+                                            if($isCompleted):
+                                                global $earnings;
+                                                $value = $job_pay; 
+                                                $checkmarkClass = "text-success";
+                                                $checkboxStatus = "checked";
+                                                // increases green checkmarks
+                                                // on progress meter
+                                                $total_complete += 1; 
+                                                $completionClass = "text-success";
+                                                $earnings += $value;
+
+                                            // Show correct CSS, value, and progress
+                                            // if chore has NOT been completed
+                                            else:                                       $value= 0;
+                                                $checkmarkClass = "text-muted";
+                                                $checkboxStatus = " ";
+                                                $total_incomplete += 1; 
+                                                //increase gray checkmarks
+                                                // on progress meter;
+                                                $completionClass = "d-none";
+
+                                            endif;
+
+                                        echo "
+
+                                                <!--    ===============================
+                                                        CHECKBOX
+                                                        =============================== -->                                        
+                                                            <input type = \"checkbox\"  
+                                                                class = \"d-none\"  
+                                                                id = \"{$checkbox_name}\"  
+                                                                name = \"{$checkbox_name}\"   
+                                                                value = \"{$value}\" 
+                                                                {$checkboxStatus}>
+
+
+
+
+
+
+                                                <!--    ===============================
+                                                        CHECKMARK ICON
+                                                        =============================== -->
+                                                            <i id = \"{$checkmark_name}\"  
+                                                                class = \"material-icons align-middle {$checkmarkClass} \">        
+                                                                check_circle </i>                                                
+
+                                                        </label>
+
+
+                                                    </div> <!-- End .col-3 .col-sm-3 .text-right .py-2 -->
+                                                </div> <!-- End .row .task-bubble -->
+                                            </div> <!-- End task bubble contents (.col-8 .col-sm-8) -->
                                             <!--    ===============================
-                                                    CHECKBOX
-                                                    =============================== -->                                        
-                                                        <input type = \"checkbox\"  
-                                                            class = \"d-none\"  
-                                                            id = \"{$checkbox_name}\"  
-                                                            name = \"{$checkbox_name}\"   
-                                                            value = \"{$value}\" 
-                                                            {$checkboxStatus}>
+                                                            COMMENT ICON 
+                                                    =============================== -->            
+                                                    <!-- Empty Comment icon -->
+                                                    <div class= \"col-2 col-sm-2\">
+                                                        <i class=\"material-icons py-3 comment-icon text-secondary\">chat_bubble</i>
+                                                    </div> <!-- End empty comment icon --> 
+                                                </div> <!--  End div.row (Task #1) -->
 
+                                                <div class=\"row\"> <!--  Next row: Completion time-stamp -->
+                                                     <!--  Left spacer -->
+                                                    <div class=\"col-2 col-sm-2\"></div>
 
+                                             <!--    ===============================
+                                                            COMPLETION DATE
+                                                    =============================== -->            
+                                                    <!--  Completion Date -->
+                                                    <div class=\"col-3 col-sm-3 task-bubble-footer text-nowrap pl-3\">
 
+                                                        <p class=\"time-stamp text-left  {$completionClass}\">
+                                                        Completed ";
+                                                    if($completion_date != null ):
+                                                        $completion_date_formatted = date_format($completion_date, 'm-d-y @ h:i A'); // Formats date in user's timezone
+                                                        echo "{$completion_date_formatted}";
+                                                    endif;
+                                                    echo "</p>
+                                                    </div>
+                                                    <div class=\"col-3 col-sm-3\"> </div>
+                                                    <!--  column spacer  -->
 
+                                                    <!--  Job Value/Pay -->
+                                                    <div class=\"col-2 col-sm-2 task-bubble-footer text-nowrap pl-3\">
+                                                     <p class = \"text-success job-pay\">Value: $ {$job_pay}</p>
+                                                    </div>
 
+                                                </div> <!--  End div.row  -->";
+                                    endwhile;
 
-                                            <!--    ===============================
-                                                    CHECKMARK ICON
-                                                    =============================== -->
-                                                        <i id = \"{$checkmark_name}\"  
-                                                            class = \"material-icons align-middle {$checkmarkClass} \">        
-                                                            check_circle </i>                                                
+                                    // Include $counter in $_POST data
+                                    echo "<input type = \"hidden\" id = \"form_counter\"  
+                                          name = \"form_counter\" value = \"{$counter}\">";
 
-                                                    </label>
-
-
-                                                </div> <!-- End .col-3 .col-sm-3 .text-right .py-2 -->
-                                            </div> <!-- End .row .task-bubble -->
-                                        </div> <!-- End task bubble contents (.col-8 .col-sm-8) -->
-                                        <!--    ===============================
-                                                        COMMENT ICON 
-                                                =============================== -->            
-                                                <!-- Empty Comment icon -->
-                                                <div class= \"col-2 col-sm-2\">
-                                                    <i class=\"material-icons py-3 comment-icon text-secondary\">chat_bubble</i>
-                                                </div> <!-- End empty comment icon --> 
-                                            </div> <!--  End div.row (Task #1) -->
-
-                                            <div class=\"row\"> <!--  Next row: Completion time-stamp -->
-                                                 <!--  Left spacer -->
-                                                <div class=\"col-2 col-sm-2\"></div>
-
-                                         <!--    ===============================
-                                                        COMPLETION DATE
-                                                =============================== -->            
-                                                <!--  Completion Date -->
-                                                <div class=\"col-3 col-sm-3 task-bubble-footer text-nowrap pl-3\">
-
-                                                    <p class=\"time-stamp text-left  {$completionClass}\">
-                                                    Completed ";
-                                                if($completion_date != null ):
-                                                    $completion_date_formatted = date_format($completion_date, 'm-d-y @ h:i A'); // Formats date in user's timezone
-                                                    echo "{$completion_date_formatted}";
-                                                endif;
-                                                echo "</p>
-                                                </div>
-                                                <div class=\"col-3 col-sm-3\"> </div>
-                                                <!--  column spacer  -->
-
-                                                <!--  Job Value/Pay -->
-                                                <div class=\"col-2 col-sm-2 task-bubble-footer text-nowrap pl-3\">
-                                                 <p class = \"text-success job-pay\">Value: $ {$job_pay}</p>
-                                                </div>
-
-                                            </div> <!--  End div.row  -->";
-                                endwhile;
-
-                                // Include $counter in $_POST data
-                                echo "<input type = \"hidden\" id = \"form_counter\"  
-                                      name = \"form_counter\" value = \"{$counter}\">";
-
-                                //Free up the result memory and close the connection
-            //                    $result_assignment-> mysqli_free_result();  // check variable name and syntax
-                                $connection3 -> close();
-                            endif; // (numrows !== 0)
+                                    //Free up the result memory and close the connection
+                //                    $result_assignment-> mysqli_free_result();  // check variable name and syntax
+                                    $connection3 -> close();
+                                endif; // (numrows !== 0)
+                            endif; // (sql_results_filter_by_id = '')
                         endif; // (connection successful)
 
                         ?>
@@ -788,7 +822,11 @@
                         <label>Page Loaded Timestamp: <input 
                             id = 'localTimestamp'
                             type = 'text'
-                            name = 'local_timestamp'
+                            name = 'local_timestamp' 
+                            value =
+                                <?php
+                                    $localTime
+                                ?>
                             >
                         </label>        
                     </p>

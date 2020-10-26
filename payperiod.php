@@ -20,7 +20,7 @@
         global $authTimeZone;
 
         if($DebugMode){
-            echo "<script>alert('User's selected timezone is: {$authTimeZone}');</script>";
+            echo "<script>alert('User\'s selected timezone is: {$authTimeZone}');</script>";
         }
 
         global $local_timestamp;
@@ -35,7 +35,7 @@
 
         // DEBUG
         if($DebugMode) {
-            echo "<script>alert('Variable local_timestamp =  {$local_timestamp_epoch} and variable local_timestamp_formatted = {$local_timestamp_formatted}.);</script>";
+            echo "<script>alert('Variable local_timestamp =  {$local_timestamp_epoch} and variable local_timestamp_formatted = {$local_timestamp_formatted}.');</script>";
         }
 
         // Format current date for sql database                     
@@ -55,10 +55,14 @@
             $currentPayPrdStartDate = $local_timestamp_date;
         //  ALTERNATIVE CODE: $currentPayPrdStartDate = date('Y-m-d', (strtotime($local_timestamp_date)));
             $currentPayPrdStartDateTime = $local_timestamp_date.' 12:00:00 AM';
+//            $currentPayPrdTimestamp = (strtotime($currentPayPrdStartDateTime));
+            $_SESSION['current_payperiod_start_date'] =  date('M. j, Y', (strtotime($currentPayPrdStartDateTime)));
 
         else:
             $currentPayPrdTimestamp = (strtotime('last Sunday '.$local_timestamp_date));
             $currentPayPrdStartDate = date('Y-m-d', $currentPayPrdTimestamp);
+            $_SESSION['current_payperiod_start_date'] =  date('M. j, Y', $currentPayPrdTimestamp);
+            
         endif;
         global $currentPayPrdTimestamp;
         $payPrdFourwksAgoTimestamp = strtotime('three weeks ago '.$currentPayPrdTimestamp);
